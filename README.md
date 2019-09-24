@@ -8,7 +8,7 @@ The template takes the desired CIDR Block as input, and outputs the newly create
 
 - AWS Account - Get one [here](https://aws.amazon.com/console/)
 - AWS CLI Installed - Instructions [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
-- AWS CLI Configured with root credenials - Instructions [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html#post-install-configure)
+- AWS CLI Configured with root credentials - Instructions [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html#post-install-configure)
 
 ## Deploy the Cloud Formation Stack
 You can deploy the script with AWS CLI.
@@ -17,16 +17,16 @@ This example shows how to create a user with a whitelisted address of 1.1.1.2.
 
 Run:
 ```
-git clone git://gitlab.com:chopchop505/aws-whitelist.git
+git clone https://github.com/jchop01/aws-whitelist.git
 cd aws-whitelist
 aws cloudformation deploy --template-file whitelist_user.yaml --stack-name test --parameter-overrides WhitelistedCIDR=1.1.1.2/32 --capabilities CAPABILITY_IAM
 ```
 
-After creation,  will need to retreive the credentials of the new user.
+After creation, retreive the credentials of the new user.
 
 Run:
 ```
-aws cloudformation   describe-stacks --stack-name test
+aws cloudformation  describe-stacks --stack-name test
 ```
 You should see JSON output which describes the stack.  You'll see the newly created credentials in the Outputs section.
 ```
