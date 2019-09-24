@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Metadata:
+  License: Apache-2.0
+Description: 'This AWS CloudFormation template is used to create a new user, allowing access strictly from a whitelisted CIDR Block of IP addresses.
+The template takes the desired CIDR Block as input, and outputs the newly created users ACCESS_KEY_ID and SECRET_ACCESS_KEY. The user can use these credentials to access ALL AWS services, when using the AWS CLI from an IP address in the whitelisted block.  The user will be denied access when attempting to use the credentials from an IP address outside of the whitelisted block.'
+Parameters:
+  WhitelistedCIDR:
+    Type: String
+    Description: CIDR block to whitelist
+    Default: '1.1.1.1/32'
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+Resources:
+  CFNUser:
+    Type: AWS::IAM::User
+  CFNUserGroup:
+    Type: AWS::IAM::Group
+  Users:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref 'CFNUserGroup'
+      Users: [!Ref 'CFNUser']
+  CFNUserPolicies:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: CFNUsers
+      Groups: [!Ref 'CFNUserGroup']
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: ['*']
+          Resource: '*'
+          Condition:
+            IpAddress:
+               aws:SourceIp:
+                 - { Ref: WhitelistedCIDR }
+  CFNKeys:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref 'CFNUser'
+Outputs:
+  AccessKey:
+    Value: !Ref 'CFNKeys'
+    Description: AWSAccessKeyId of new user
+  SecretKey:
+    Value: !GetAtt [CFNKeys, SecretAccessKey]
+    Description: AWSSecretAccessKey of new user
